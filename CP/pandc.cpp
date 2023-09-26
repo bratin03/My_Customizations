@@ -1,4 +1,4 @@
-dsunamespace pandc
+namespace pandc
 {
     vector<ll> FACTORIAL(MAXN);
     vector<ll> POWER(MAXN);
