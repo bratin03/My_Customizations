@@ -8,6 +8,33 @@ case $- in
       *) return;;
 esac
 
+
+# Add this function to your .bashrc or .bash_profile
+FBHC(){
+  if [ $# -ne 3 ]; then
+    echo "Usage: compile_and_run_cpp <cpp_file> <input_txt_file> <output_txt_file>"
+    return 1
+  fi
+
+  cpp_file="$1"
+  input_file="$2"
+  output_file="$3"
+
+  # Compile the C++ source code
+  g++ "$cpp_file" -o a.out
+
+  # Check if compilation was successful
+  if [ $? -eq 0 ]; then
+    # Run the compiled program with input and redirect output to the specified file
+    ./a.out < "$input_file" > "$output_file"
+    echo "Compilation and execution completed successfully."
+    cat "$output_file"
+  else
+    echo "Compilation failed."
+  fi
+}
+
+
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
 HISTCONTROL=ignoreboth
@@ -115,139 +142,68 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
-source /opt/ros/noetic/setup.bash
+# source /opt/ros/noetic/setup.bash
 
-# >>> conda initialize >>>
-# !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/home/bratin/anaconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "/home/bratin/anaconda3/etc/profile.d/conda.sh" ]; then
-        . "/home/bratin/anaconda3/etc/profile.d/conda.sh"
-    else
-        export PATH="/home/bratin/anaconda3/bin:$PATH"
-    fi
-fi
-unset __conda_setup
-# <<< conda initialize <<<
+
 export LD_LIBRARY_PATH=/usr/local/lib
 
 
-source /opt/ros/noetic/setup.bash
+# source /opt/ros/noetic/setup.bash
 
 
 alias q=exit
 alias c=clear
 alias g=git
 
-neofetch
+make_clean_and_build() {
+    make clean
+    make
+}
+
+# neofetch
+
+fortune
 
 
+cool_commands(){
+	cowsay "BM" | lolcat
+	fortune | cowsay -f tux | lolcat
+	figlet "BM" | lolcat
+	oneko
 
-#!/bin/sh
+}
 
-##	+-----------------------------------+-----------------------------------+
-##	|                                                                       |
-##	|                            FANCY BASH PROMT                           |
-##	|                                                                       |
-##	| Copyright (c) 2018, Andres Gongora <mail@andresgongora.com>.          |
-##	|                                                                       |
-##	| This program is free software: you can redistribute it and/or modify  |
-##	| it under the terms of the GNU General Public License as published by  |
-##	| the Free Software Foundation, either version 3 of the License, or     |
-##	| (at your option) any later version.                                   |
-##	|                                                                       |
-##	| This program is distributed in the hope that it will be useful,       |
-##	| but WITHOUT ANY WARRANTY; without even the implied warranty of        |
-##	| MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         |
-##	| GNU General Public License for more details.                          |
-##	|                                                                       |
-##	| You should have received a copy of the GNU General Public License     |
-##	| along with this program. If not, see <http://www.gnu.org/licenses/>.  |
-##	|                                                                       |
-##	+-----------------------------------------------------------------------+
+lnet() {
+  echo "Available campus wifi: "
+  nmcli device wifi list | awk '$1 ~ /^48:/'
+}
 
-
-##
-##	DESCRIPTION:
-##	This script updates your "PS1" environment variable to display colors.
-##	Addicitionally, it also shortens the name of your current part to maximum
-##	25 characters, which is quite useful when working in deeply nested folders.
-##
-##
-##
-##	INSTALLATION:
-##	Copy this script to your home folder and rename it to ".fancy-bash-promt.sh"
-##	Run this command from any terminal: 
-##		echo "source ~/.fancy-bash-promt.sh" >> ~/.bashrc
-##
-##	Alternatively, copy the content of this file into your .bashrc file
-##
-##
-##
-##	FUNCTIONS:
-##
-##	* bash_prompt_command()
-##	  This function takes your current working directory and stores a shortened
-##	  version in the variable "NEW_PWD".
-##
-##	* format_font()
-##	  A small helper function to generate color formating codes from simple
-##	  number codes (defined below as local variables for convenience).
-##
-##	* bash_prompt()
-##	  This function colorizes the bash promt. The exact color scheme can be
-##	  configured here. The structure of the function is as follows:
-##		1. A. Definition of available colors for 16 bits.
-##		1. B. Definition of some colors for 256 bits (add your own).
-##		2. Configuration >> EDIT YOUR PROMT HERE<<.
-##		4. Generation of color codes.
-##		5. Generation of window title (some terminal expect the first
-##		   part of $PS1 to be the window title)
-##		6. Formating of the bash promt ($PS1).
-##
-##	* Main script body:	
-##	  It calls the adequate helper functions to colorize your promt and sets
-##	  a hook to regenerate your working directory "NEW_PWD" when you change it.
-## 
+cnct() {
+  networks_sorted_by_signal=$(lnet | awk 'NR>1 {print $1, $2, $3, $4, $5, $6}' | sort -rn)
+  while read -r bssid freq signal_strength ssid mode security; do
+    nmcli device wifi connect "$bssid" || continue
+    break
+  done <<< "$networks_sorted_by_signal"
+  echo "Connected to: $(nmcli connection show --active | grep 'wifi' | head -n 1 | awk '{print $1}')" | lolcat
+}
 
 
 
 
-################################################################################
-##  FUNCTIONS                                                                 ##
-################################################################################
-
-##
-##	ARRANGE $PWD AND STORE IT IN $NEW_PWD
-##	* The home directory (HOME) is replaced with a ~
-##	* The last pwdmaxlen characters of the PWD are displayed
-##	* Leading partial directory names are striped off
-##		/home/me/stuff -> ~/stuff (if USER=me)
-##		/usr/share/big_dir_name -> ../share/big_dir_name (if pwdmaxlen=20)
-##
-##	Original source: WOLFMAN'S color bash promt
-##	https://wiki.chakralinux.org/index.php?title=Color_Bash_Prompt#Wolfman.27s
-##
 bash_prompt_command() {
-	# How many characters of the $PWD should be kept
+
 	local pwdmaxlen=25
 
-	# Indicate that there has been dir truncation
 	local trunc_symbol=".."
 
-	# Store local dir
 	local dir=${PWD##*/}
 
-	# Which length to use
 	pwdmaxlen=$(( ( pwdmaxlen < ${#dir} ) ? ${#dir} : pwdmaxlen ))
 
 	NEW_PWD=${PWD/#$HOME/\~}
 	
 	local pwdoffset=$(( ${#NEW_PWD} - pwdmaxlen ))
 
-	# Generate name
 	if [ ${pwdoffset} -gt "0" ]
 	then
 		NEW_PWD=${NEW_PWD:$pwdoffset:$pwdmaxlen}
@@ -255,15 +211,9 @@ bash_prompt_command() {
 	fi
 }
 
-
-
-
-##
-##	GENERATE A FORMAT SEQUENCE
-##
 format_font()
 {
-	## FIRST ARGUMENT TO RETURN FORMAT STRING
+
 	local output=$1
 
 
@@ -284,18 +234,9 @@ format_font()
 }
 
 
-
-##
-## COLORIZE BASH PROMT
-##
 bash_prompt() {
 
-	############################################################################
-	## COLOR CODES                                                            ##
-	## These can be used in the configuration below                           ##
-	############################################################################
-	
-	## FONT EFFECT
+
 	local      NONE='0'
 	local      BOLD='1'
 	local       DIM='2'
@@ -303,9 +244,7 @@ bash_prompt() {
 	local     BLINK='5'
 	local    INVERT='7'
 	local    HIDDEN='8'
-	
-	
-	## COLORS
+
 	local   DEFAULT='9'
 	local     BLACK='0'
 	local       RED='1'
@@ -323,16 +262,12 @@ bash_prompt() {
 	local L_MAGENTA='65'
 	local    L_CYAN='66'
 	local     WHITE='67'
-	
-	
-	## TYPE
+
 	local     RESET='0'
 	local    EFFECT='0'
 	local     COLOR='30'
 	local        BG='40'
-	
-	
-	## 256 COLOR CODES
+
 	local NO_FORMAT="\[\033[0m\]"
 	local ORANGE_BOLD="\[\033[1;38;5;208m\]"
 	local TOXIC_GREEN_BOLD="\[\033[1;38;5;118m\]"
@@ -343,24 +278,6 @@ bash_prompt() {
 	local GRAY_BOLD="\[\033[1;90m\]"
 	local BLUE_BOLD="\[\033[1;38;5;74m\]"
 	
-	
-	
-	
-	
-	##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  
-	  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##
-	##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ## 
-
-	
-	
-	##                          CONFIGURE HERE                                ##
-
-	
-	
-	############################################################################
-	## CONFIGURATION                                                          ##
-	## Choose your color combination here                                     ##
-	############################################################################
 	local FONT_COLOR_1=$WHITE
 	local BACKGROUND_1=$CYAN
 	local TEXTEFFECT_1=$BOLD
@@ -375,35 +292,20 @@ bash_prompt() {
 	
 	local PROMT_FORMAT=$BLUE_BOLD
 
-	
-	############################################################################
-	## EXAMPLE CONFIGURATIONS                                                 ##
-	## I use them for different hosts. Test them out ;)                       ##
-	############################################################################
-	
-	## CONFIGURATION: BLUE-WHITE
 	if [ "$HOSTNAME" = dell ]; then
 		FONT_COLOR_1=$WHITE; BACKGROUND_1=$BLUE; TEXTEFFECT_1=$BOLD
 		FONT_COLOR_2=$WHITE; BACKGROUND_2=$L_BLUE; TEXTEFFECT_2=$BOLD	
 		FONT_COLOR_3=$D_GRAY; BACKGROUND_3=$WHITE; TEXTEFFECT_3=$BOLD	
 		PROMT_FORMAT=$CYAN_BOLD
 	fi
-	
-	## CONFIGURATION: BLACK-RED
+
 	if [ "$HOSTNAME" = giraff6 ]; then
 		FONT_COLOR_1=$WHITE; BACKGROUND_1=$BLACK; TEXTEFFECT_1=$BOLD
 		FONT_COLOR_2=$WHITE; BACKGROUND_2=$D_GRAY; TEXTEFFECT_2=$BOLD
 		FONT_COLOR_3=$WHITE; BACKGROUND_3=$RED; TEXTEFFECT_3=$BOLD
 		PROMT_FORMAT=$RED_BOLD
 	fi
-	
-	## CONFIGURATION: RED-BLACK
-	#FONT_COLOR_1=$WHITE; BACKGROUND_1=$RED; TEXTEFFECT_1=$BOLD
-	#FONT_COLOR_2=$WHITE; BACKGROUND_2=$D_GRAY; TEXTEFFECT_2=$BOLD
-	#FONT_COLOR_3=$WHITE; BACKGROUND_3=$BLACK; TEXTEFFECT_3=$BOLD
-	#PROMT_FORMAT=$RED_BOLD
 
-	## CONFIGURATION: CYAN-BLUE
 	if [ "$HOSTNAME" = sharkoon ]; then
 		FONT_COLOR_1=$BLACK; BACKGROUND_1=$L_CYAN; TEXTEFFECT_1=$BOLD
 		FONT_COLOR_2=$WHITE; BACKGROUND_2=$L_BLUE; TEXTEFFECT_2=$BOLD
@@ -411,7 +313,7 @@ bash_prompt() {
 		PROMT_FORMAT=$CYAN_BOLD
 	fi
 	
-	## CONFIGURATION: GRAY-SCALE
+
 	if [ "$HOSTNAME" = giraff ]; then
 		FONT_COLOR_1=$WHITE; BACKGROUND_1=$BLACK; TEXTEFFECT_1=$BOLD
 		FONT_COLOR_2=$WHITE; BACKGROUND_2=$D_GRAY; TEXTEFFECT_2=$BOLD
@@ -419,7 +321,7 @@ bash_prompt() {
 		PROMT_FORMAT=$BLACK_BOLD
 	fi
 	
-	## CONFIGURATION: GRAY-CYAN
+
 	if [ "$HOSTNAME" = light ]; then
 		FONT_COLOR_1=$WHITE; BACKGROUND_1=$BLACK; TEXTEFFECT_1=$BOLD
 		FONT_COLOR_2=$WHITE; BACKGROUND_2=$D_GRAY; TEXTEFFECT_2=$BOLD
@@ -428,19 +330,7 @@ bash_prompt() {
 	fi
 	
 	
-	##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  
-	  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##
-	##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ## 	
 
-	
-	
-	
-	############################################################################
-	## TEXT FORMATING                                                         ##
-	## Generate the text formating according to configuration                 ##
-	############################################################################
-	
-	## CONVERT CODES: add offset
 	FC1=$(($FONT_COLOR_1+$COLOR))
 	BG1=$(($BACKGROUND_1+$BG))
 	FE1=$(($TEXTEFFECT_1+$EFFECT))
@@ -458,7 +348,7 @@ bash_prompt() {
 	FE4=$(($TEXTEFFECT_4+$EFFECT))
 	
 
-	## CALL FORMATING HELPER FUNCTION: effect + font color + BG color
+
 	local TEXT_FORMAT_1
 	local TEXT_FORMAT_2
 	local TEXT_FORMAT_3
@@ -468,21 +358,11 @@ bash_prompt() {
 	format_font TEXT_FORMAT_3 $FC3 $FE3 $BG3
 	format_font TEXT_FORMAT_4 $FC4 $FE4 $BG4
 	
-	
-	# GENERATE PROMT SECTIONS
 	local PROMT_USER=$"$TEXT_FORMAT_1 \u "
 	local PROMT_HOST=$"$TEXT_FORMAT_2 \h "
 	local PROMT_PWD=$"$TEXT_FORMAT_3 \${NEW_PWD} "
 	local PROMT_INPUT=$"$PROMT_FORMAT "
 
-
-	############################################################################
-	## SEPARATOR FORMATING                                                    ##
-	## Generate the separators between sections                               ##
-	## Uses background colors of the sections                                 ##
-	############################################################################
-	
-	## CONVERT CODES
 	TSFC1=$(($BACKGROUND_1+$COLOR))
 	TSBG1=$(($BACKGROUND_2+$BG))
 	
@@ -493,7 +373,7 @@ bash_prompt() {
 	TSBG3=$(($DEFAULT+$BG))
 	
 
-	## CALL FORMATING HELPER FUNCTION: effect + font color + BG color
+
 	local SEPARATOR_FORMAT_1
 	local SEPARATOR_FORMAT_2
 	local SEPARATOR_FORMAT_3
@@ -502,18 +382,12 @@ bash_prompt() {
 	format_font SEPARATOR_FORMAT_3 $TSFC3 $TSBG3
 	
 
-	# GENERATE SEPARATORS WITH FANCY TRIANGLE
 	local TRIANGLE=$'\uE0B0'	
 	local SEPARATOR_1=$SEPARATOR_FORMAT_1$TRIANGLE
 	local SEPARATOR_2=$SEPARATOR_FORMAT_2$TRIANGLE
 	local SEPARATOR_3=$SEPARATOR_FORMAT_3$TRIANGLE
 
 
-
-	############################################################################
-	## WINDOW TITLE                                                           ##
-	## Prevent messed up terminal-window titles                               ##
-	############################################################################
 	case $TERM in
 	xterm*|rxvt*)
 		local TITLEBAR='\[\033]0;\u:${NEW_PWD}\007\]'
@@ -523,17 +397,8 @@ bash_prompt() {
 		;;
 	esac
 
-
-
-	############################################################################
-	## BASH PROMT                                                             ##
-	## Generate promt and remove format from the rest                         ##
-	############################################################################
 	PS1="$TITLEBAR\n${PROMT_USER}${SEPARATOR_1}${PROMT_HOST}${SEPARATOR_2}${PROMT_PWD}${SEPARATOR_3}${PROMT_INPUT}"
 
-	
-
-	## For terminal line coloring, leaving the rest standard
 	none="$(tput sgr0)"
 	trap 'echo -ne "${none}"' DEBUG
 }
@@ -541,60 +406,47 @@ bash_prompt() {
 
 
 
-################################################################################
-##  MAIN                                                                      ##
-################################################################################
 
-##	Bash provides an environment variable called PROMPT_COMMAND. 
-##	The contents of this variable are executed as a regular Bash command 
-##	just before Bash displays a prompt. 
-##	We want it to call our own command to truncate PWD and store it in NEW_PWD
 PROMPT_COMMAND=bash_prompt_command
 
-##	Call bash_promnt only once, then unset it (not needed any more)
-##	It will set $PS1 with colors and relative to $NEW_PWD, 
-##	which gets updated by $PROMT_COMMAND on behalf of the terminal
+
 bash_prompt
 unset bash_prompt
 
 
 
-### EOF ###
 
 
 distribution ()
 {
 	local dtype
-	# Assume unknown
+
 	dtype="unknown"
 	
-	# First test against Fedora / RHEL / CentOS / generic Redhat derivative
+
 	if [ -r /etc/rc.d/init.d/functions ]; then
 		source /etc/rc.d/init.d/functions
 		[ zz`type -t passed 2>/dev/null` == "zzfunction" ] && dtype="redhat"
-	
-	# Then test against SUSE (must be after Redhat,
-	# I've seen rc.status on Ubuntu I think? TODO: Recheck that)
+
 	elif [ -r /etc/rc.status ]; then
 		source /etc/rc.status
 		[ zz`type -t rc_reset 2>/dev/null` == "zzfunction" ] && dtype="suse"
 	
-	# Then test against Debian, Ubuntu and friends
+
 	elif [ -r /lib/lsb/init-functions ]; then
 		source /lib/lsb/init-functions
 		[ zz`type -t log_begin_msg 2>/dev/null` == "zzfunction" ] && dtype="debian"
 	
-	# Then test against Gentoo
+
 	elif [ -r /etc/init.d/functions.sh ]; then
 		source /etc/init.d/functions.sh
 		[ zz`type -t ebegin 2>/dev/null` == "zzfunction" ] && dtype="gentoo"
 	
-	# For Mandriva we currently just test if /etc/mandriva-release exists
-	# and isn't empty (TODO: Find a better way :)
+
 	elif [ -s /etc/mandriva-release ]; then
 		dtype="mandriva"
 
-	# For Slackware we currently just test if /etc/slackware-version exists
+
 	elif [ -s /etc/slackware-version ]; then
 		dtype="slackware"
 
@@ -617,7 +469,7 @@ ver ()
 		cat /etc/SuSE-release
 	elif [ $dtype == "debian" ]; then
 		lsb_release -a
-		# sudo cat /etc/issue && sudo cat /etc/issue.net && sudo cat /etc/lsb_release && sudo cat /etc/os-release # Linux Mint option 2
+
 	elif [ $dtype == "gentoo" ]; then
 		cat /etc/gentoo-release
 	elif [ $dtype == "mandriva" ]; then
@@ -774,35 +626,68 @@ function git_init() {
     fi
 }
 
-function weather_report() {
+# function weather_report() {
 
-    local response=$(curl --silent 'https://api.openweathermap.org/data/2.5/weather?id=5128581&units=imperial&appid=<YOUR_API_KEY>')
+#     local response=$(curl --silent 'https://api.openweathermap.org/data/2.5/weather?id=5128581&units=imperial&appid=<YOUR_API_KEY>')
 
-    # Check for the 200 response indicating a successful API query.
-    local status=$(echo $response | grep -o '"cod":[^,}]*' | grep -o '[^:]*$')
-    case $status in
-        200)
-            local location=$(echo $response | grep -o '"name":[^,}]*' | grep -o '[^:]*$')
-            local country=$(echo $response | grep -o '"country":[^,}]*' | grep -o '[^:]*$')
-            local forecast=$(echo $response | grep -o '"description":[^,}]*' | grep -o '[^:]*$')
-            local temp=$(echo $response | grep -o '"temp":[^,}]*' | grep -o '[^:]*$')
-            local temp_min=$(echo $response | grep -o '"temp_min":[^,}]*' | grep -o '[^:]*$')
-            local temp_max=$(echo $response | grep -o '"temp_max":[^,}]*' | grep -o '[^:]*$')
+#     local status=$(echo $response | grep -o '"cod":[^,}]*' | grep -o '[^:]*$')
+#     case $status in
+#         200)
+#             local location=$(echo $response | grep -o '"name":[^,}]*' | grep -o '[^:]*$')
+#             local country=$(echo $response | grep -o '"country":[^,}]*' | grep -o '[^:]*$')
+#             local forecast=$(echo $response | grep -o '"description":[^,}]*' | grep -o '[^:]*$')
+#             local temp=$(echo $response | grep -o '"temp":[^,}]*' | grep -o '[^:]*$')
+#             local temp_min=$(echo $response | grep -o '"temp_min":[^,}]*' | grep -o '[^:]*$')
+#             local temp_max=$(echo $response | grep -o '"temp_max":[^,}]*' | grep -o '[^:]*$')
 
-            printf "Location: %s %s\n" "$location" "$country"
-            printf "Forecast: %s\n" "$forecast"
-            printf "Temperature: %.1f°F\n" "$temp"
-            printf "Temp Min: %.1f°F\n" "$temp_min"
-            printf "Temp Max: %.1f°F\n" "$temp_max"
-            ;;
-        *) 
-            echo "Error: Failed to retrieve weather data. Status code: $status"
-            ;;
-    esac
+#             printf "Location: %s %s\n" "$location" "$country"
+#             printf "Forecast: %s\n" "$forecast"
+#             printf "Temperature: %.1f°F\n" "$temp"
+#             printf "Temp Min: %.1f°F\n" "$temp_min"
+#             printf "Temp Max: %.1f°F\n" "$temp_max"
+#             ;;
+#         *) 
+#             echo "Error: Failed to retrieve weather data. Status code: $status"
+#             ;;
+#     esac
 
-}
+# }
 
 export PATH="$PATH":~/.local/bin
 export PATH="$PATH":usr/local/lib
 
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+# eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
+comment_c_runner() {
+    # Check if the correct number of arguments is provided
+    if [ "$#" -ne 1 ]; then
+        echo "Usage: run_c_code <c_file>"
+        return 1
+    fi
+
+    # Extract the filename and extension
+    filename=$(basename -- "$1")
+    extension="${filename##*.}"
+
+    # Check if the file has a .c extension
+    if [ "$extension" != "c" ]; then
+        echo "Error: Input file must have a .c extension"
+        return 1
+    fi
+
+    # Compile the C code
+    gcc -o "${filename%.*}.out" "$1"
+
+    # Check if compilation was successful
+    if [ $? -eq 0 ]; then
+        # Execute the compiled program and capture its output
+        output=$("./${filename%.*}.out")
+
+        # Append the output as a comment at the end of the C code
+        echo -e "\n/* Output of the C code:\n$output\n*/" >> "$1"
+        
+        echo "C code executed successfully. Output added as a comment in $1."
+    else
+        echo "Compilation failed. Unable to execute the C code."
+    fi
+}
