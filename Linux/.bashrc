@@ -162,7 +162,7 @@ make_clean_and_build() {
 
 # neofetch
 
-fortune
+# fortune
 
 
 cool_commands(){
