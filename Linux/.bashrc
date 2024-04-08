@@ -142,13 +142,26 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
-# source /opt/ros/noetic/setup.bash
+source /opt/ros/noetic/setup.bash
 
-
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/home/bratin/anaconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/home/bratin/anaconda3/etc/profile.d/conda.sh" ]; then
+        . "/home/bratin/anaconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="/home/bratin/anaconda3/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
 export LD_LIBRARY_PATH=/usr/local/lib
 
 
-# source /opt/ros/noetic/setup.bash
+source /opt/ros/noetic/setup.bash
 
 
 alias q=exit
@@ -160,9 +173,18 @@ make_clean_and_build() {
     make
 }
 
-# neofetch
 
-# fortune
+#figlet "Bratin"
+
+echo "
+█████████████████████████████████████
+█▄─▄─▀█▄─▄▄▀██▀▄─██─▄─▄─█▄─▄█▄─▀█▄─▄█
+██─▄─▀██─▄─▄██─▀─████─████─███─█▄▀─██
+▀▄▄▄▄▀▀▄▄▀▄▄▀▄▄▀▄▄▀▀▄▄▄▀▀▄▄▄▀▄▄▄▀▀▄▄▀" | lolcat
+
+neofetch
+
+fortune
 
 
 cool_commands(){
@@ -626,37 +648,11 @@ function git_init() {
     fi
 }
 
-# function weather_report() {
-
-#     local response=$(curl --silent 'https://api.openweathermap.org/data/2.5/weather?id=5128581&units=imperial&appid=<YOUR_API_KEY>')
-
-#     local status=$(echo $response | grep -o '"cod":[^,}]*' | grep -o '[^:]*$')
-#     case $status in
-#         200)
-#             local location=$(echo $response | grep -o '"name":[^,}]*' | grep -o '[^:]*$')
-#             local country=$(echo $response | grep -o '"country":[^,}]*' | grep -o '[^:]*$')
-#             local forecast=$(echo $response | grep -o '"description":[^,}]*' | grep -o '[^:]*$')
-#             local temp=$(echo $response | grep -o '"temp":[^,}]*' | grep -o '[^:]*$')
-#             local temp_min=$(echo $response | grep -o '"temp_min":[^,}]*' | grep -o '[^:]*$')
-#             local temp_max=$(echo $response | grep -o '"temp_max":[^,}]*' | grep -o '[^:]*$')
-
-#             printf "Location: %s %s\n" "$location" "$country"
-#             printf "Forecast: %s\n" "$forecast"
-#             printf "Temperature: %.1f°F\n" "$temp"
-#             printf "Temp Min: %.1f°F\n" "$temp_min"
-#             printf "Temp Max: %.1f°F\n" "$temp_max"
-#             ;;
-#         *) 
-#             echo "Error: Failed to retrieve weather data. Status code: $status"
-#             ;;
-#     esac
-
-# }
 
 export PATH="$PATH":~/.local/bin
 export PATH="$PATH":usr/local/lib
 
-# eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
 comment_c_runner() {
     # Check if the correct number of arguments is provided
@@ -690,4 +686,148 @@ comment_c_runner() {
     else
         echo "Compilation failed. Unable to execute the C code."
     fi
+}
+
+export C_INCLUDE_PATH=$C_INCLUDE_PATH:/usr/include/postgresql
+
+ppt_to_pdf(){
+soffice --headless --convert-to pdf "$1"
+}
+
+
+
+# Function to create a tar.gz file
+create_tar_gz() {
+    local source_dir="$1"
+    local output_filename="$2"
+
+    # Check if the source directory exists
+    if [ ! -d "$source_dir" ]; then
+        echo "Error: Source directory does not exist."
+        return 1
+    fi
+
+    # Create the tar.gz file
+    echo "Creating tar.gz file..."
+    tar -czvf "$output_filename" "$source_dir"
+
+    # Check if the tar.gz file was created successfully
+    if [ $? -eq 0 ]; then
+        echo "Tar.gz file created successfully: $output_filename"
+    else
+        echo "Error: Failed to create tar.gz file."
+        return 1
+    fi
+}
+
+
+# Function to remove .vscode directories and files recursively from a directory
+remove_vscode_files() {
+    if [ $# -ne 1 ]; then
+        echo "Usage: remove_vscode_files <directory>"
+        return 1
+    fi
+
+    local directory="$1"
+
+    if [ ! -d "$directory" ]; then
+        echo "Error: '$directory' is not a valid directory."
+        return 1
+    fi
+
+    echo "Removing .vscode directories and files recursively from '$directory'..."
+
+    find "$directory" -name .vscode -exec rm -rf {} \;
+
+    echo "Done."
+}
+
+# Function to remove .out and .o files recursively from a directory
+remove_out_o_files() {
+    if [ $# -ne 1 ]; then
+        echo "Usage: remove_out_o_files <directory>"
+        return 1
+    fi
+
+    local directory="$1"
+
+    if [ ! -d "$directory" ]; then
+        echo "Error: '$directory' is not a valid directory."
+        return 1
+    fi
+
+    echo "Removing .out and .o files recursively from '$directory'..."
+
+    find "$directory" -type f \( -name "*.out" -o -name "*.o" \) -exec rm -f {} +
+
+    echo "Done."
+}
+
+# Function to enter a directory and list its contents
+cdl() {
+    cd "$1" && ls
+}
+
+# Function to create a directory and enter it
+mkcd() {
+    mkdir -p "$1" && cd "$1"
+}
+
+# Function to count the number of files in the current directory
+countfiles_recursive() {
+	local count=$(find . -type f | wc -l)
+	echo "Number of files in the current directory (including subdirectories): $count"
+}
+
+#!/bin/bash
+
+# Define the function
+ascii_clock() {
+    L1=(" --- " "    ." " --- " " --- " ".   ." " --- " " --- " " --- " " --- " " --- ")
+    L2=("|   |" "    |" "    |" "    |" "|   |" "|    " "|    " "    |" "|   |" "|   |")
+    L3=("|   |" "    |" " --- " " --- " " ---|" " --- " "|--- " "    |" " --- " " ---|")
+    L4=("|   |" "    |" "|    " "    |" "    |" "    |" "|   |" "    |" "|   |" "    |")
+    L5=(" --- " "    ." " --- " " --- " "    ." " --- " " --- " "    ." " --- " " --- ")
+
+    ch="o"
+    pattern="(.*) ([0-9])([0-9]):([0-9])([0-9]):([0-9])([0-9]) ([A-Za-z][A-Za-z])"
+    while [ true ]; do
+       clear
+       vskip=$(((LINES - 9) / 2))
+       hskip=$(((COLUMNS - 55) / 2))
+       h=""; i=0; while [ $i -lt $hskip ]; do h="$h "; i=$((i+1)); done
+       t=`date +"%A %d %B %Y %I:%M:%S %p %Z"`
+       if [[ $t =~ $pattern ]]; then
+          d=${BASH_REMATCH[1]}
+          h1=${BASH_REMATCH[2]}
+          h2=${BASH_REMATCH[3]}
+          m1=${BASH_REMATCH[4]}
+          m2=${BASH_REMATCH[5]}
+          s1=${BASH_REMATCH[6]}
+          s2=${BASH_REMATCH[7]}
+          m=${BASH_REMATCH[8]}
+          i=0; while [ $i -lt $vskip ]; do echo ""; i=$((i+1)); done
+          echo "$h$d"
+          echo "$h+-----------------------------------------------------+"
+          echo "$h|  ${L1[$h1]}  ${L1[$h2]}     ${L1[$m1]}  ${L1[$m2]}     ${L1[$s1]}  ${L1[$s2]}     |"
+          echo "$h|  ${L2[$h1]}  ${L2[$h2]}  $ch  ${L2[$m1]}  ${L2[$m2]}  $ch  ${L2[$s1]}  ${L2[$s2]}     |"
+          echo "$h|  ${L3[$h1]}  ${L3[$h2]}     ${L3[$m1]}  ${L3[$m2]}     ${L3[$s1]}  ${L3[$s2]}     |"
+          echo "$h|  ${L4[$h1]}  ${L4[$h2]}  $ch  ${L4[$m1]}  ${L4[$m2]}  $ch  ${L4[$s1]}  ${L4[$s2]}     |"
+          echo "$h|  ${L5[$h1]}  ${L5[$h2]}     ${L5[$m1]}  ${L5[$m2]}     ${L5[$s1]}  ${L5[$s2]}  $m |"
+          echo "$h+-----------------------------------------------------+"
+       else
+          echo $t
+       fi
+       read -t 0.49 c && exit 0
+       if [ $ch == "o" ]; then ch=" "; else ch="o"; fi
+    done
+}
+
+image_to_ascii() {
+	if [ $# -ne 1 ]; then
+		echo "Usage: image_to_ascii <image_file>"
+		return 1
+	fi
+
+	img2txt -W 180 -f utf8 -d fstein "$1"
 }

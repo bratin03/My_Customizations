@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400;0,500;0,700;0,900;1,400;1,500;1,700;1,900&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="./style.css">
+  <style>
+    /* Add your custom CSS styles here */
+
+    /* Adjust padding for main container */
+    .mycontainer {
+      padding-left: 10%;
+      padding-right: 10%;
+      padding-top: 5%;
+    }
+
+    /* Adjust margin for social buttons */
+    .social-buttons {
+      margin-top: 10px;
+    }
+
+    /* Adjust margin for search container */
+    #search-container {
+      margin-top: 20px;
+    }
+
+    /* Adjust margin for apps container */
+    #apps-container {
+      margin-top: 20px;
+    }
+
+    /* Adjust margin for link headings */
+    h3.txt-ne {
+      margin-left: 11%;
+      margin-bottom: 12%;
+    }
+
+    /* Adjust margin for links container */
+    #links-container {
+      padding-left: 10%;
+      padding-right: 10%;
+    }
+
+    /* Adjust padding and margin for user menu button */
+    #user-menu-button {
+      margin-right: 5%;
+      margin-top: 5%;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="main-wrapper" class="fancy-scrollbar">
+    <div id="main">
+      <div id="content">
+        <div id="links-container">
+          <a href="https://gmail.com">Gmail</a>
+          <a href="https://github.com/bratin03?tab=repositories">Github</a>
+          <a href="https://www.overleaf.com/project">Overleaf</a>
+          <a href="https://www.linkedin.com/in/bratin-mondal-689b03m/">Linkedin</a>
+        </div>
+        <div class="mycontainer">
+          <div id="header-container">
+            <div class='parent'>
+              <div class='child'>
+                <main>
+                  <div class="atom">
+                    <div class="electron"></div>
+                    <div class="electron-alpha"></div>
+                    <div class="electron-omega"></div>
+                  </div>
+                </main>
+              </div>
+              <div class='child'>
+                <button type="button" id="user-menu-button">
+                  <img src="dp.png" style="height: 200px; width: 200px;" alt="" />
+                </button>
+                <div class="social-buttons">
+                  <a href="https://moodlecse.iitkgp.ac.in/moodle/course/view.php?id=562"
+                    class="social-button moodle_course" aria-label="OS">
+                    Operating Systems
+                  </a>
+                  <a href="https://moodlecse.iitkgp.ac.in/moodle/course/view.php?id=580"
+                    class="social-button moodle_course" aria-label="DBMS">
+                    Database Management Systems
+                  </a>
+                  <a href="https://moodlecse.iitkgp.ac.in/moodle/course/view.php?id=571"
+                    class="social-button moodle_course" aria-label="CN">
+                    Networks
+                  </a>
+                  <a href="https://moodlecse.iitkgp.ac.in/moodle/course/view.php?id=561"
+                    class="social-button moodle_course" aria-label="Ml">
+                    Machine Learning
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <a href="#" style="display: inline-block;">
+          <h3 class="txt-ne" data-text="Developer Rahul">
+            <div id="editable-text" contenteditable="true">Coding is Love ❤️</div>
+          </h3>
+        </a>
+        <div id="search-container">
+          <div id="search-input-container">
+            <img src="https://assets.codepen.io/1468070/Google+G+Icon.png" alt="" />
+            <input type="text" placeholder="Search anything" id="search" />
+          </div>
+          <button id="image-button" onclick="googleSearch();" type="button">
+            <i class="fa-regular fa-search"></i>
+          </button>
+          <button id="mic-button" type="button">
+            <i class="fa-regular fa-microphone"></i>
+          </button>
+        </div>
+        <div id="apps-container">
+          <!-- YouTube -->
+          <a href="https://www.youtube.com">
+            <i class="fa-brands fa-youtube"></i>
+            <div class="label">
+              <span class="name">YouTube</span>
+              <span class="url">youtube.com</span>
+            </div>
+          </a>
+          <!-- YouTube Music -->
+          <a href="https://music.youtube.com">
+            <i class="fa-brands fa-youtube"></i>
+            <div class="label">
+              <span class="name">YouTube Music</span>
+              <span class="url">music.youtube.com</span>
+            </div>
+          </a>
+          <!-- Gmail -->
+          <a href="https://mail.google.com">
+            <i class="fa-brands fa-google"></i>
+            <div class="label">
+              <span class="name">Gmail</span>
+              <span class="url">mail.google.com</span>
+            </div>
+          </a>
+          <!-- GitHub -->
+          <a href="https://github.com">
+            <i class="fa-brands fa-github"></i>
+            <div class="label">
+              <span class="name">GitHub</span>
+              <span class="url">github.com</span>
+            </div>
+          </a>
+          <!-- ChatGPT -->
+          <a href="https://chat.openai.com">
+            <svg width="26" height="26" viewBox="0 0 41 41" fill="#10A37F" xmlns="http://www.w3.org/2000/svg"
+              stroke-width="1.5" class="h-6 w-6">
+              <!-- SVG path for ChatGPT -->
+            </svg>
+            <div class="label">
+              <span class="name">ChatGPT</span>
+              <span class="url" contenteditable="true">chat.openai.com</span>
+            </div>
+          </a>
+          <!-- ERP - IIT Kharagpur -->
+          <a href="https://erp.iitkgp.ac.in">
+            <img src="https://iili.io/HMIU1g2.png" style="height: 24px; width: 24px;">
+            <div class="label">
+              <span class="name">ERP - IIT Kharagpur</span>
+              <span class="url">erp.iitkgp.ac.in</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // JavaScript code
+  </script>
+</body>
+
+</html>
