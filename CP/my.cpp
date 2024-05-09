@@ -1,12 +1,33 @@
+/*
+    * Template for competitive programming
+    * Author: Bratin Mondal
+
+    * Deparment of Computer Science and Engineering
+    * Indian Institue of Technology, Kharagpur
+*/
+
 #include <bits/stdc++.h>
 #define ll long long
 #define ull unsigned long long
+#define endl "\n"
+#define vi vector<int>
+#define vll vector<ll>
+#define pii pair<int, int>
+#define pll pair<ll, ll>
+#define vpii vector<pii>
+#define vpll vector<pll>
+#define vvi vector<vi>
+#define vvl vector<vll>
 #define t(k) cin >> k
 #define c(x) cout << x << endl
 #define l(i, x, y) for (ll i = x; i < y; i++)
 #define le(i, x, y) for (ll i = x; i <= y; i++)
+#define lr(i, x, y) for (ll i = x - 1; i >= y; i--)
+#define lre(i, x, y) for (ll i = x; i >= y; i--)
 #define yes cout << "YES" << endl
 #define no cout << "NO" << endl
+#define alice cout << "Alice" << endl
+#define bob cout << "Bob" << endl
 #define prDouble(x) cout << fixed << setprecision(10) << x
 #define all(x) x.begin(), x.end()
 #define rall(x) x.rbegin(), x.end()
@@ -33,6 +54,10 @@
     for (int i = 0; i < n; i++, cout << "\n")                   \
         for (int j = 0; j < m && cout << vec[i][j] << " "; j++) \
             ;
+#define fast                          \
+    ios_base::sync_with_stdio(false); \
+    cin.tie(NULL);                    \
+    cout.tie(NULL);
 using namespace std;
 const ll MOD = 1e9 + 7;
 const ll MAXN = 1e5 + 9;
@@ -58,19 +83,18 @@ ll mod_inv(ll a, ll m = MOD)
 }
 
 void solve()
-{ // your code goes here
+{
+    // your code goes here
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    cout.tie(NULL);
+    fast;
     ll t = 1;
-    cin >> t;
+    cin >> t; // comment out if only one test case
     while (t--)
     {
         solve();
     }
-    return 0;
+    exit(0);
 }
