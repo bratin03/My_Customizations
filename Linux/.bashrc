@@ -831,3 +831,49 @@ image_to_ascii() {
 
 	img2txt -W 180 -f utf8 -d fstein "$1"
 }
+
+# Function to compile and run a C++ file
+run_cpp() {
+    # Check if the file argument is provided
+    if [ -z "$1" ]; then
+        echo "Usage: run_cpp <file.cpp>"
+        return 1
+    fi
+
+    # Get the filename without extension
+    filename=$(basename -- "$1")
+    filename="${filename%.*}"
+
+    # Compile the C++ file to an executable
+    g++ "$1" -o "${filename}.out"
+    if [ $? -eq 0 ]; then
+        echo "Compiled successfully to ${filename}.out"
+        # Run the executable
+        ./"${filename}.out"
+    else
+        echo "Compilation failed"
+    fi
+}
+
+# Function to compile and run a C file
+run_c() {
+    # Check if the file argument is provided
+    if [ -z "$1" ]; then
+        echo "Usage: run_c <file.c>"
+        return 1
+    fi
+
+    # Get the filename without extension
+    filename=$(basename -- "$1")
+    filename="${filename%.*}"
+
+    # Compile the C file to an executable
+    gcc "$1" -o "${filename}.out"
+    if [ $? -eq 0 ]; then
+        echo "Compiled successfully to ${filename}.out"
+        # Run the executable
+        ./"${filename}.out"
+    else
+        echo "Compilation failed"
+    fi
+}
