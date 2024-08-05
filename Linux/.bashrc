@@ -142,7 +142,6 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
-source /opt/ros/noetic/setup.bash
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
@@ -159,10 +158,6 @@ fi
 unset __conda_setup
 # <<< conda initialize <<<
 export LD_LIBRARY_PATH=/usr/local/lib
-
-
-source /opt/ros/noetic/setup.bash
-
 
 alias q=exit
 alias c=clear
@@ -209,8 +204,10 @@ cnct() {
   echo "Connected to: $(nmcli connection show --active | grep 'wifi' | head -n 1 | awk '{print $1}')" | lolcat
 }
 
-
-
+cse_server()
+{
+	ssh 21CS10016@10.5.18.69
+}
 
 bash_prompt_command() {
 
@@ -426,18 +423,10 @@ bash_prompt() {
 }
 
 
-
-
-
 PROMPT_COMMAND=bash_prompt_command
-
 
 bash_prompt
 unset bash_prompt
-
-
-
-
 
 distribution ()
 {
@@ -876,4 +865,30 @@ run_c() {
     else
         echo "Compilation failed"
     fi
+}
+
+convert_and_delete_pptx() {
+    # Check if libreoffice is installed
+    if ! command -v libreoffice &> /dev/null; then
+        echo "LibreOffice is not installed. Please install it to use this function."
+        return 1
+    fi
+
+    # Check if directory is specified
+    if [ -z "$1" ]; then
+        echo "Please provide a directory."
+        return 1
+    fi
+
+    # Convert all pptx files to pdf
+    for file in "$1"/*.pptx; {
+        [ -e "$file" ] || continue
+        libreoffice --headless --convert-to pdf "$file" --outdir "$1"
+        if [ $? -eq 0 ]; then
+            echo "Converted $file to PDF."
+            rm "$file"
+        else
+            echo "Failed to convert $file."
+        fi
+    }
 }
