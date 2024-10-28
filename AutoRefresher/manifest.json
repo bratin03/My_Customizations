@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "Auto Refresher",
+  "version": "1.0",
+  "description": "Automatically refreshes the current tab at a configurable interval.",
+  "permissions": ["activeTab", "storage", "tabs", "scripting"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon.png",
+      "48": "icon.png",
+      "128": "icon.png"
+    }
+  },
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  }
+}

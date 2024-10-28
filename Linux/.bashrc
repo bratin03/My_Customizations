@@ -908,10 +908,11 @@ compile_with_pthread() {
 export PATH=$PATH:"/usr/local/texlive/2024/bin/x86_64-linux"
 
 timer() {
-	start=$(date +%s)
-	"$@"
-	end=$(date +%s)
-	echo "Time taken: $((end - start)) seconds"
+	start=$(date +%s%N)       # Get the start time in nanoseconds
+	"$@"                      # Execute the command
+	end=$(date +%s%N)         # Get the end time in nanoseconds
+	duration=$((end - start)) # Calculate the duration in nanoseconds
+	echo "Time taken: $((duration / 1000000000)) seconds and $((duration % 1000000000)) nanoseconds"
 }
 
 backup() {
@@ -1039,4 +1040,86 @@ uptime_info() {
 clearcache() {
 	sudo sync
 	sudo sysctl -w vm.drop_caches=3
+}
+
+replace_spaces() {
+	if [ -z "$1" ]; then
+		echo "Usage: replace_spaces <directory>"
+		return 1
+	fi
+	for file in "$1"/*; do
+		if [ -d "$file" ]; then
+			# If it's a directory, recursively call this function
+			replace_spaces "$file"
+		elif [ -f "$file" ]; then
+			# Replace spaces with underscores in file name
+			new_name=$(echo "$file" | tr ' ' '_')
+			if [ "$file" != "$new_name" ]; then
+				mv "$file" "$new_name"
+				echo "Renamed: $file -> $new_name"
+			fi
+		fi
+	done
+}
+
+erase_cache() {
+	# Help option
+	if [[ $1 == "-h" ]]; then
+		echo "Usage: erase_cache [options]"
+		echo "Clears system, user, and optionally package manager caches."
+		echo
+		echo "Options:"
+		echo "  -h                     Display this help message."
+		echo "  --include-pkg-cache    Also clear package manager caches (e.g., APT for Debian/Ubuntu)."
+		return
+	fi
+
+	# Prompt for confirmation
+	read -p "Are you sure you want to clear caches? This may impact system performance temporarily. (y/n): " confirm
+	if [[ $confirm != [yY] ]]; then
+		echo "Cache clear operation aborted."
+		return
+	fi
+
+	# Clear system cache
+	echo "Clearing system cache..."
+	sudo sync
+	echo 3 | sudo tee /proc/sys/vm/drop_caches >/dev/null || {
+		echo "Failed to clear system cache"
+		return
+	}
+	echo "System cache cleared."
+
+	# Clear user cache
+	echo "Clearing user cache..."
+	rm -rf ~/.cache/* || {
+		echo "Failed to clear user cache"
+		return
+	}
+	echo "User cache cleared."
+
+	# Optional: Clear package manager caches
+	if [[ $1 == "--include-pkg-cache" ]]; then
+		echo "Clearing package manager caches..."
+		sudo apt clean || {
+			echo "Failed to clear APT cache"
+			return
+		}
+		echo "Package manager caches cleared."
+	fi
+
+	echo "All selected caches cleared successfully."
+}
+
+docx_to_pdf() {
+    if [ -z "$1" ]; then
+        echo "Usage: docx_to_pdf filename.docx"
+        return 1
+    fi
+    if [[ ! -f "$1" ]]; then
+        echo "File not found: $1"
+        return 1
+    fi
+    libreoffice --headless --convert-to pdf "$1"
+    echo "Converted $1 to PDF."
 }
